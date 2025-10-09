@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36202.13 d17.14
+VisualStudioVersion = 17.14.36202.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smart-car-sharing", "Smart-car-sharing\Smart-car-sharing.csproj", "{305A7902-A1DD-4178-AA67-BC6C8CBA5ABD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCarSharingApp", "Smart-car-sharing\SmartCarSharingApp.csproj", "{305A7902-A1DD-4178-AA67-BC6C8CBA5ABD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCarSharingApp.Tests", "Smart-car-sharing.Tests\SmartCarSharingApp.Tests.csproj", "{884F005B-376B-4F17-9890-4160DBA62783}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{305A7902-A1DD-4178-AA67-BC6C8CBA5ABD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{305A7902-A1DD-4178-AA67-BC6C8CBA5ABD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{305A7902-A1DD-4178-AA67-BC6C8CBA5ABD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{884F005B-376B-4F17-9890-4160DBA62783}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{884F005B-376B-4F17-9890-4160DBA62783}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{884F005B-376B-4F17-9890-4160DBA62783}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{884F005B-376B-4F17-9890-4160DBA62783}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
