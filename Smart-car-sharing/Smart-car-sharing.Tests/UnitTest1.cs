@@ -1,5 +1,5 @@
 using Xunit;
-using SmartCarSharingApp;
+using SmartCarSharingApp.Core;
 
 namespace SmartCarSharingApp.Tests
 {

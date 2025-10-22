@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmartCarSharingApp
+namespace SmartCarSharingApp.Core
 {
     public class Calculator
     {
