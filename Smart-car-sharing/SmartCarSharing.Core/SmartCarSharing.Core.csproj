@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SmartCarSharing.Data\SmartCarSharing.Data.csproj" />
-  </ItemGroup>
-
 </Project>
