@@ -3,6 +3,7 @@ using Moq;
 using SmartCarSharingApp.UI.ViewModels;
 using SmartCarSharing.Core.Services;
 using System.Threading.Tasks;
+using System;
 
 namespace SmartCarSharingApp.Tests
 {
@@ -23,6 +24,7 @@ namespace SmartCarSharingApp.Tests
             _viewModel.Name = "Andrii";
             _viewModel.Email = "test@example.com";
             _viewModel.Password = "securePass123";
+            _viewModel.ConfirmPassword = "securePass123"; 
 
             await _viewModel.RegisterCommand.ExecuteAsync(null);
 
@@ -30,39 +32,46 @@ namespace SmartCarSharingApp.Tests
         }
 
         [Fact]
-        public async Task RegisterCommand_ShouldNotCallService_WhenNameIsEmpty()
+        public void RegisterCommand_CanExecute_ShouldBeFalse_WhenPasswordsDoNotMatch()
         {
-            _viewModel.Name = ""; 
-            _viewModel.Email = "valid@email.com";
-            _viewModel.Password = "12345";
-
-            await _viewModel.RegisterCommand.ExecuteAsync(null);
-
-            _mockAuthService.Verify(s => s.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task RegisterCommand_ShouldNotCallService_WhenEmailIsEmpty()
-        {
-            _viewModel.Name = "User";
-            _viewModel.Email = "   ";
-            _viewModel.Password = "12345";
-
-            await _viewModel.RegisterCommand.ExecuteAsync(null);
-
-            _mockAuthService.Verify(s => s.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task RegisterCommand_ShouldNotCallService_WhenPasswordIsEmpty()
-        {
-            _viewModel.Name = "User";
+            _viewModel.Name = "Test";
             _viewModel.Email = "test@test.com";
-            _viewModel.Password = null; 
+            _viewModel.Password = "123456";
+            _viewModel.ConfirmPassword = "654321"; 
+
+            bool canExecute = _viewModel.RegisterCommand.CanExecute(null);
+
+            Assert.False(canExecute);
+        }
+
+        [Fact]
+        public void RegisterCommand_CanExecute_ShouldBeFalse_WhenAnyFieldIsEmpty()
+        {
+            _viewModel.Name = "";
+            _viewModel.Email = "test@test.com";
+            _viewModel.Password = "123";
+            _viewModel.ConfirmPassword = "123";
+
+            bool canExecute = _viewModel.RegisterCommand.CanExecute(null);
+
+            Assert.False(canExecute);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_ShouldSetErrorMessage_WhenEmailExists()
+        {
+            _viewModel.Name = "Test";
+            _viewModel.Email = "exist@test.com";
+            _viewModel.Password = "123";
+            _viewModel.ConfirmPassword = "123";
+
+            _mockAuthService
+                .Setup(s => s.RegisterUserAsync(It.IsAny<string>(), "exist@test.com", It.IsAny<string>()))
+                .ThrowsAsync(new InvalidOperationException("Користувач вже існує"));
 
             await _viewModel.RegisterCommand.ExecuteAsync(null);
 
-            _mockAuthService.Verify(s => s.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            Assert.Equal("Користувач вже існує", _viewModel.ErrorMessage);
         }
     }
 }

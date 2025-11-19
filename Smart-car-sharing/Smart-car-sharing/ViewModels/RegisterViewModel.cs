@@ -1,14 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCarSharing.Core.Services;
+using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows; 
 
 namespace SmartCarSharingApp.UI.ViewModels
 {
     public partial class RegisterViewModel : ObservableObject
     {
         private readonly IAuthenticationService _authService;
+        public Action? RequestNavigateToLogin { get; set; }
 
         public RegisterViewModel(IAuthenticationService authService)
         {
@@ -16,26 +18,72 @@ namespace SmartCarSharingApp.UI.ViewModels
         }
 
         [ObservableProperty]
-        private string name;
+        [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
+        private string name = string.Empty;
 
         [ObservableProperty]
-        private string email;
+        [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
+        private string email = string.Empty;
 
         [ObservableProperty]
-        private string password;
+        [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
+        private string password = string.Empty;
 
         [ObservableProperty]
-        private string confirmPassword;
+        [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
+        private string confirmPassword = string.Empty;
 
-        [RelayCommand]
+        [ObservableProperty]
+        private string errorMessage = string.Empty;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
+        private bool isBusy;
+
+        private bool CanRegister()
+        {
+            bool isFilled = !string.IsNullOrWhiteSpace(Name) &&
+                            !string.IsNullOrWhiteSpace(Email) &&
+                            !string.IsNullOrWhiteSpace(Password) &&
+                            !string.IsNullOrWhiteSpace(ConfirmPassword);
+
+            bool isEmailValid = Regex.IsMatch(Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+
+            bool passwordsMatch = Password == ConfirmPassword;
+
+            return isFilled && isEmailValid && passwordsMatch && !IsBusy;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanRegister))]
         private async Task RegisterAsync()
         {
-            if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
-            {
-                return;
-            }
+            IsBusy = true;
+            ErrorMessage = string.Empty;
 
-            await _authService.RegisterUserAsync(Name, Email, Password);
+            try
+            {
+                if (Password != ConfirmPassword)
+                {
+                    ErrorMessage = "Паролі не співпадають!";
+                    return;
+                }
+
+                await _authService.RegisterUserAsync(Name, Email, Password);
+
+                RequestNavigateToLogin?.Invoke();
+            }
+            catch (InvalidOperationException ex)
+            {
+                ErrorMessage = ex.Message;
+            }
+            catch (Exception)
+            {
+                ErrorMessage = "Сталася невідома помилка. Спробуйте пізніше.";
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }

@@ -9,6 +9,6 @@ namespace SmartCarSharing.Core.Services
     public interface IAuthenticationService
     {
         Task RegisterUserAsync(string name, string email, string password);
-        Task<User> LoginUserAsync(string email, string password);
+        Task<User?> LoginUserAsync(string email, string password);
     }
 }
