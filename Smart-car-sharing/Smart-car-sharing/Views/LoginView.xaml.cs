@@ -1,12 +1,9 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using SmartCarSharingApp.UI.ViewModels;
 
 namespace SmartCarSharingApp.UI.Views
 {
-    /// <summary>
-    /// Логіка взаємодії для LoginView.xaml
-    /// </summary>
     public partial class LoginView : UserControl
     {
         public LoginView()
@@ -14,22 +11,17 @@ namespace SmartCarSharingApp.UI.Views
             InitializeComponent();
         }
 
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        // Передача пароля у ViewModel
+        private void PasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)
         {
-            // Отримання даних
-            string email = EmailBox.Text;
-            string password = PasswordBox.Password;
-
-            // TODO: 1. Валідація полів (перевірка на пусті значення)
-            // TODO: 2. Додати 'async' та викликати await _authService.LoginUserAsync(email, password)
-            // TODO: 3. Якщо успішно -> відкрити Dashboard / MainView
-
-            MessageBox.Show($"Спроба входу для: {email}", "Інфо", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (this.DataContext is LoginViewModel vm)
+            {
+                vm.Password = PasswordBox.Password;
+            }
         }
 
         private void NavigateToRegister_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Реалізувати навігацію на RegisterView
             MessageBox.Show("Перехід до реєстрації.", "Навігація", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
