@@ -5,12 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Smart_car_sharing"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="55*"/>
-            <RowDefinition Height="379*"/>
-        </Grid.RowDefinitions>
+        Title="Smart Car Sharing - Головна панель" Height="600" Width="900"
+        WindowStartupLocation="CenterScreen">
 
+    <Grid Background="#F0F2F5">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="🚗" 
+                       FontSize="64" 
+                       HorizontalAlignment="Center" 
+                       Margin="0,0,0,20"/>
+
+            <TextBlock Text="Ласкаво просимо!" 
+                       FontSize="48" 
+                       FontWeight="Bold" 
+                       Foreground="#333333"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,10"/>
+
+            <TextBlock Text="Ви успішно увійшли в систему." 
+                       FontSize="18" 
+                       Foreground="Green"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,30"/>
+
+            <TextBlock Text="Це заглушка для головної панелі керування." 
+                       FontSize="14" 
+                       Foreground="Gray"
+                       FontStyle="Italic"
+                       HorizontalAlignment="Center"/>
+        </StackPanel>
     </Grid>
 </Window>
