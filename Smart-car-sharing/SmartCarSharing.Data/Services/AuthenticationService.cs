@@ -19,7 +19,7 @@ namespace SmartCarSharing.Data.Services
 
         public async Task RegisterUserAsync(string name, string email, string password)
         {
-            var emailExists = await _context.users
+            var emailExists = await _context.Users
                 .AnyAsync(u => u.Email.ToLower() == email.ToLower());
 
             if (emailExists)
@@ -36,19 +36,22 @@ namespace SmartCarSharing.Data.Services
                 HashedPassword = hashedPassword
             };
 
-            _context.users.Add(newUser);
+            _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
         }
 
         public async Task<User?> LoginUserAsync(string email, string password)
         {
-            var user = await _context.users
+            var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.HashedPassword))
-            {
+            if (user == null)
                 return null;
-            }
+
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.HashedPassword);
+
+            if (!isPasswordValid)
+                return null;
 
             return user;
         }
