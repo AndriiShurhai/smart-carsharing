@@ -29,7 +29,6 @@ namespace SmartCarSharingApp.UI.ViewModels
             }
         }
 
-        // Команда для кнопки "Увійти"
         public ICommand LoginCommand { get; }
 
         public LoginViewModel()
