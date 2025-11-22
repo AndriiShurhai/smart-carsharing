@@ -11,7 +11,6 @@ namespace SmartCarSharingApp.UI.Views
             InitializeComponent();
         }
 
-        // Передача пароля у ViewModel
         private void PasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)
         {
             if (this.DataContext is LoginViewModel vm)
