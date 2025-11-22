@@ -47,7 +47,6 @@
                              Padding="5"
                              PasswordChanged="PasswordBox_OnPasswordChanged"/>
 
-                <!-- Login button -->
                 <Button Content="Увійти"
                         Height="35"
                         Background="#007ACC"
