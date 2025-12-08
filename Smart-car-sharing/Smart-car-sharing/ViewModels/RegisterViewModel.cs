@@ -10,6 +10,7 @@ namespace SmartCarSharingApp.UI.ViewModels
     public partial class RegisterViewModel : ObservableObject
     {
         private readonly IAuthenticationService _authService;
+
         public Action? RequestNavigateToLogin { get; set; }
 
         public RegisterViewModel(IAuthenticationService authService)
@@ -47,8 +48,8 @@ namespace SmartCarSharingApp.UI.ViewModels
                             !string.IsNullOrWhiteSpace(Password) &&
                             !string.IsNullOrWhiteSpace(ConfirmPassword);
 
+            // Basic email regex
             bool isEmailValid = Regex.IsMatch(Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-
             bool passwordsMatch = Password == ConfirmPassword;
 
             return isFilled && isEmailValid && passwordsMatch && !IsBusy;
@@ -84,6 +85,12 @@ namespace SmartCarSharingApp.UI.ViewModels
             {
                 IsBusy = false;
             }
+        }
+
+        [RelayCommand]
+        private void NavigateToLogin()
+        {
+            RequestNavigateToLogin?.Invoke();
         }
     }
 }

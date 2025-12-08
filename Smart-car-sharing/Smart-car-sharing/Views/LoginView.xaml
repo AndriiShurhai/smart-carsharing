@@ -7,10 +7,6 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="400">
 
-    <!-- Підключаємо ViewModel -->
-    <UserControl.DataContext>
-        <viewModels:LoginViewModel />
-    </UserControl.DataContext>
 
     <Grid Background="#F5F5F5">
         <Border Background="White" 
@@ -61,9 +57,9 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="Немає акаунту? " Foreground="Gray"/>
                     <TextBlock>
-                        <Hyperlink Click="NavigateToRegister_Click">
+                        <Hyperlink Command="{Binding NavigateToRegisterCommand}">
                             Зареєструватися
-                        </Hyperlink>
+                        </Hyperlink>        
                     </TextBlock>
                 </StackPanel>
 

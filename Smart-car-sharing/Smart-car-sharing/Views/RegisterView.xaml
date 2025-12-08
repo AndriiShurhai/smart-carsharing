@@ -68,8 +68,7 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock Text="Вже маєте акаунт? " Foreground="Gray"/>
                     <TextBlock>
-                        <Hyperlink Click="NavigateToLogin_Click">
-                            Увійти
+                        <Hyperlink Command="{Binding NavigateToLoginCommand}"> Увійти
                         </Hyperlink>
                     </TextBlock>
                 </StackPanel>
