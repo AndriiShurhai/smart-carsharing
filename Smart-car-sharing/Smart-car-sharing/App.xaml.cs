@@ -8,6 +8,9 @@ using Serilog;
 using Serilog.Extensions.Logging;
 using SmartCarSharing.Core.Builders;
 using SmartCarSharing.Core;
+using SmartCarSharing.Core.Services;
+using SmartCarSharing.Data.Services;
+
 
 namespace SmartCarSharingApp.UI
 {
@@ -84,6 +87,11 @@ namespace SmartCarSharingApp.UI
 
             // 4. Setup Services
             IAuthenticationService authService = new AuthenticationService(_context);
+
+            ICarService carService = new CarService(
+                _context,
+                LoggerFactory!.CreateLogger<CarService>()
+            );
 
             var mainViewModel = new MainViewModel(authService);
 
