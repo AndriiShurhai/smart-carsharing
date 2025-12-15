@@ -16,7 +16,6 @@ namespace SmartCarSharingApp.UI
 {
     public partial class App : Application
     {
-        // We keep a reference to the factory so we can pass loggers to other services
         public static ILoggerFactory? LoggerFactory { get; private set; }
 
         private AppDbContext _context;
