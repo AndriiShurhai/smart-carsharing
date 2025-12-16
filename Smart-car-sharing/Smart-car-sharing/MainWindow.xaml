@@ -6,7 +6,7 @@
         xmlns:viewmodels="clr-namespace:SmartCarSharingApp.UI.ViewModels"
         xmlns:views="clr-namespace:SmartCarSharingApp.UI.Views"
         mc:Ignorable="d"
-        Title="Smart Car Sharing" Height="600" Width="900"
+        Title="Smart Car Sharing" Height="650" Width="1000"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -16,6 +16,16 @@
 
         <DataTemplate DataType="{x:Type viewmodels:RegisterViewModel}">
             <views:RegisterView />
+        </DataTemplate>
+
+        <!-- ДОДАНО: Шаблон для Дашборду -->
+        <DataTemplate DataType="{x:Type viewmodels:DashboardViewModel}">
+            <views:DashboardView />
+        </DataTemplate>
+
+        <!-- ДОДАНО: Шаблон для Деталей -->
+        <DataTemplate DataType="{x:Type viewmodels:CarDetailsViewModel}">
+            <views:CarDetailsView />
         </DataTemplate>
     </Window.Resources>
 
