@@ -8,12 +8,14 @@ using Serilog;
 using Serilog.Extensions.Logging;
 using SmartCarSharing.Core.Builders;
 using SmartCarSharing.Core;
+using SmartCarSharing.Core.Services;
+using SmartCarSharing.Data.Services;
+
 
 namespace SmartCarSharingApp.UI
 {
     public partial class App : Application
     {
-        // We keep a reference to the factory so we can pass loggers to other services
         public static ILoggerFactory? LoggerFactory { get; private set; }
 
         private AppDbContext _context;
@@ -84,6 +86,11 @@ namespace SmartCarSharingApp.UI
 
             // 4. Setup Services
             IAuthenticationService authService = new AuthenticationService(_context);
+
+            ICarService carService = new CarService(
+                _context,
+                LoggerFactory!.CreateLogger<CarService>()
+            );
 
             var mainViewModel = new MainViewModel(authService);
 
