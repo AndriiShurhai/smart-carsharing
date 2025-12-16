@@ -92,7 +92,8 @@ namespace SmartCarSharingApp.UI
                 LoggerFactory!.CreateLogger<CarService>()
             );
 
-            var mainViewModel = new MainViewModel(authService);
+            var mainViewModel = new MainViewModel(authService, carService);
+
 
             var mainWindow = new MainWindow
             {

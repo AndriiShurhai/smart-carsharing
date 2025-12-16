@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using SmartCarSharing.Core; // Додано для класу Car
 using SmartCarSharing.Core.Services;
+using SmartCarSharing.Data.Services;
 using System;
 
 namespace SmartCarSharingApp.UI.ViewModels
@@ -19,32 +20,24 @@ namespace SmartCarSharingApp.UI.ViewModels
         [ObservableProperty]
         private object _currentViewModel;
 
-        public MainViewModel(IAuthenticationService authService)
+        private readonly ICarService _carService;
+
+        public MainViewModel(
+            IAuthenticationService authService,
+            ICarService carService)
         {
             _authService = authService;
+            _carService = carService;
 
-            // Ініціалізація ViewModels
             _loginViewModel = new LoginViewModel(_authService);
             _registerViewModel = new RegisterViewModel(_authService);
-            _dashboardViewModel = new DashboardViewModel();
+            _dashboardViewModel = new DashboardViewModel(_carService);
 
-            // --- Налаштування навігації ---
-
-            // 1. Login -> Register
-            _loginViewModel.RequestNavigateToRegister += () => CurrentViewModel = _registerViewModel;
-
-            // 2. Register -> Login
-            _registerViewModel.RequestNavigateToLogin += () => CurrentViewModel = _loginViewModel;
-
-            // 3. Login -> Dashboard (тимчасова імітація, тут треба додати подію в LoginViewModel)
-            // Поки що ми просто стартуємо з Дашборду для тестування
-
-            // 4. Dashboard -> CarDetails
             _dashboardViewModel.RequestNavigateToDetails += NavigateToCarDetails;
 
-            // Запускаємо Дашборд за замовчуванням для перевірки завдання
             CurrentViewModel = _dashboardViewModel;
         }
+
 
         private void NavigateToCarDetails(Car car)
         {

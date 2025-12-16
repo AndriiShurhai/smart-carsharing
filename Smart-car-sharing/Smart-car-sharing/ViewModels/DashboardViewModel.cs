@@ -1,43 +1,80 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCarSharing.Core;
+using SmartCarSharing.Core.Services;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace SmartCarSharingApp.UI.ViewModels
 {
     public partial class DashboardViewModel : ObservableObject
     {
-        // Колекція, до якої прив'язується інтерфейс
-        [ObservableProperty]
-        private ObservableCollection<Car> _cars;
+        private readonly ICarService _carService;
+
+        // ====== PROPERTIES ======
 
         [ObservableProperty]
-        private string _searchText;
+        private ObservableCollection<Car> cars = new();
 
-        // Подія, яку слухає MainViewModel для перемикання екрану
-        public Action<Car> RequestNavigateToDetails { get; set; }
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
+        private string searchText = string.Empty;
 
-        public DashboardViewModel()
+        [ObservableProperty]
+        private bool isBusy;
+
+        // ====== NAVIGATION ======
+        public Action<Car>? RequestNavigateToDetails { get; set; }
+
+        // ====== CONSTRUCTOR ======
+        public DashboardViewModel(ICarService carService)
         {
-            Cars = new ObservableCollection<Car>();
-            LoadMockData();
+            _carService = carService;
+            _ = LoadAllCarsAsync();
         }
 
-        private void LoadMockData()
-        {
-            // Тестові дані для перевірки відображення сітки
-            Cars.Add(new Car { Make = "Tesla", Model = "Model 3", Year = 2022, PricePerHour = 45, Location = "Київ, Центр" });
-            Cars.Add(new Car { Make = "Toyota", Model = "Camry", Year = 2020, PricePerHour = 25, Location = "Київ, Аеропорт" });
-            Cars.Add(new Car { Make = "BMW", Model = "X5", Year = 2023, PricePerHour = 60, Location = "Львів, Вокзал" });
-            Cars.Add(new Car { Make = "Ford", Model = "Focus", Year = 2019, PricePerHour = 20, Location = "Одеса" });
-            Cars.Add(new Car { Make = "Audi", Model = "Q7", Year = 2021, PricePerHour = 55, Location = "Київ, Поділ" });
-            Cars.Add(new Car { Make = "Nissan", Model = "Leaf", Year = 2018, PricePerHour = 18, Location = "Харків" });
-        }
+        // ====== COMMANDS ======
 
-        // Ця команда викликається, коли натискають "Деталі" на картці
         [RelayCommand]
-        private void ViewDetails(Car car)
+        private async Task LoadAllCarsAsync()
+        {
+            IsBusy = true;
+
+            try
+            {
+                var result = await _carService.GetAllCarsAsync();
+                Cars = new ObservableCollection<Car>(result);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand(CanExecute = nameof(CanSearch))]
+        private async Task SearchAsync()
+        {
+            IsBusy = true;
+
+            try
+            {
+                var result = await _carService.GetFilteredCarsAsync(SearchText);
+                Cars = new ObservableCollection<Car>(result);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private bool CanSearch()
+        {
+            return !IsBusy;
+        }
+
+        [RelayCommand]
+        private void OpenDetails(Car car)
         {
             if (car != null)
             {
