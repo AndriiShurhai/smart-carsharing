@@ -1,0 +1,90 @@
+﻿<UserControl x:Class="SmartCarSharingApp.UI.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SmartCarSharingApp.UI.Views"
+             xmlns:viewmodels="clr-namespace:SmartCarSharingApp.UI.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="900">
+
+    <d:UserControl.DataContext>
+        <viewmodels:DashboardViewModel/>
+    </d:UserControl.DataContext>
+
+    <Grid Background="#F0F2F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Пошук -->
+            <RowDefinition Height="*"/>
+            <!-- Список авто -->
+        </Grid.RowDefinitions>
+
+        <!-- 1. Верхня панель з пошуком -->
+        <Border Grid.Row="0" Background="White" Padding="20,15" BorderBrush="#E5E5E5" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Доступні авто" 
+                           FontSize="24" 
+                           FontWeight="Bold" 
+                           VerticalAlignment="Center"
+                           Foreground="#333"/>
+
+                <!-- Пошук справа -->
+                <Border Grid.Column="1" 
+                        Background="#F5F7FA" 
+                        CornerRadius="20" 
+                        Width="300" 
+                        Height="40">
+                    <Grid>
+                        <TextBlock Text="🔍" 
+                                   HorizontalAlignment="Left" 
+                                   VerticalAlignment="Center" 
+                                   Margin="15,0,0,0" 
+                                   Opacity="0.5"/>
+
+                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 VerticalAlignment="Center"
+                                 Margin="40,0,10,0"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 FontSize="14"
+                                 Padding="0"
+                                 VerticalContentAlignment="Center"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- 2. Список автомобілів -->
+        <ScrollViewer Grid.Row="1" Padding="20">
+            <!-- ItemsControl відображає список без можливості виділення рядка (як у ListBox), що краще для карток -->
+            <ItemsControl ItemsSource="{Binding Cars}">
+
+                <!-- ItemsPanel: WrapPanel змушує елементи переноситись на новий рядок -->
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <!-- ItemTemplate: Вигляд кожного елемента списку -->
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Використовуємо наш CarCard. 
+                             Прив'язуємо команду ViewDetailsCommand з DashboardViewModel.
+                             Передаємо поточний об'єкт (Car) як параметр. -->
+                        <local:CarCard Margin="0,0,20,20"
+                                       Command="{Binding DataContext.ViewDetailsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                       CommandParameter="{Binding}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
