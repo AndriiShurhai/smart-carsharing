@@ -82,7 +82,7 @@ namespace SmartCarSharingApp.UI.ViewModels
         }
 
         [RelayCommand]
-        private void OpenDetails(Car car)
+        private void ViewDetails(Car car)
         {
             if (car != null)
             {

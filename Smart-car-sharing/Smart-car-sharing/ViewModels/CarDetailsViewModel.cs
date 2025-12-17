@@ -24,8 +24,13 @@ namespace SmartCarSharingApp.UI.ViewModels
                 Location = "Test Location"
             };
         }
-        // -------------------------------------------------------
+        public Action<Car>? RequestNavigateToBooking { get; set; }
 
+        [RelayCommand]
+        private void BookNow()
+        {
+            RequestNavigateToBooking?.Invoke(_car);
+        }
         public CarDetailsViewModel(Car car)
         {
             _car = car ?? throw new ArgumentNullException(nameof(car));
