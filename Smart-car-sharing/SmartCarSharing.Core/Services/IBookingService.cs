@@ -1,6 +1,7 @@
-﻿using System;
+﻿using SmartCarSharing.Core;
+using SmartCarSharing.Core.DTOs;
+using System;
 using System.Threading.Tasks;
-using SmartCarSharing.Core;
 
 namespace SmartCarSharing.Core.Services
 {
@@ -8,10 +9,11 @@ namespace SmartCarSharing.Core.Services
     {
         Task<BookingResult> CreateBookingAsync(int userId, int carId, DateTime start, DateTime end);
 
-        // ЗМІНЕНО: Було (int carId, int days) -> Стало (..., double hours)
         Task<decimal> CalculatePriceAsync(int carId, double hours);
 
         decimal CalculatePrice(Car car, DateTime start, DateTime end);
+
+        Task<List<BookingDto>> GetBookingsByUserIdAsync(int userId);
     }
 
     public class BookingResult

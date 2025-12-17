@@ -1,9 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SmartCarSharing.Core;
+using SmartCarSharing.Core.DTOs;
 using SmartCarSharing.Core.Services;
 using SmartCarSharing.Data;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -20,6 +23,34 @@ namespace SmartCarSharing.Data.Services
             _logger = logger;
         }
 
+        // --- Метод для отримання бронювань користувача (JOIN з таблицею Cars) ---
+        public async Task<List<BookingDto>> GetBookingsByUserIdAsync(int userId)
+        {
+            _logger.LogInformation("Fetching bookings for user {UserId}", userId);
+
+            // Використовуємо JOIN, щоб отримати назву авто разом з даними про бронювання
+            var query = from b in _context.Bookings
+                        join c in _context.Cars on b.CarId equals c.Id
+                        where b.UserId == userId
+                        orderby b.StartTime descending // Сортуємо: найновіші зверху
+                        select new BookingDto
+                        {
+                            Id = b.Id,
+                            CarMake = c.Make,
+                            CarModel = c.Model,
+                            StartTime = b.StartTime,
+                            EndTime = b.EndTime,
+                            TotalCost = b.TotalCost
+                        };
+
+            var result = await query.ToListAsync();
+            _logger.LogInformation("Found {Count} bookings for user {UserId}", result.Count, userId);
+
+            return result;
+        }
+
+        // --- Інші методи сервісу ---
+
         public decimal CalculatePrice(Car car, DateTime start, DateTime end)
         {
             if (end <= start) return 0;
@@ -32,6 +63,12 @@ namespace SmartCarSharing.Data.Services
         {
             var car = await _context.Cars.FindAsync(carId);
             if (car == null) throw new ArgumentException("Car not found");
+
+            decimal billableHours = (decimal)hours;
+            return car.PricePerHour * billableHours;
+        }
+
+        public decimal CalculatePrice(Car car, DateTime start, DateTime end)
             return car.PricePerHour * (decimal)hours;
         }
 
@@ -39,6 +76,9 @@ namespace SmartCarSharing.Data.Services
         {
             _logger.LogInformation($"Validating booking for User {userId}, Car {carId}...");
 
+            var duration = end - start;
+            // Округляємо до повної години вгору (мінімум 1 година)
+            var hours = Math.Max(1, Math.Ceiling(duration.TotalHours));
             // --- 1. ПЕРЕВІРКИ КОРИСТУВАЧА ---
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return BookingResult.Failure("Користувача не знайдено.");
