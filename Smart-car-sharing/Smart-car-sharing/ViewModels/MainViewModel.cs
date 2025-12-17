@@ -19,7 +19,6 @@ namespace SmartCarSharingApp.UI.ViewModels
         private readonly DashboardViewModel _dashboardViewModel;
         private CarDetailsViewModel _carDetailsViewModel;
         private BookingViewModel _bookingViewModel;
-        private CarDetailsViewModel _carDetailsViewModel; // Створюється динамічно
         private readonly MyBookingsViewModel _myBookingsViewModel; 
 
         [ObservableProperty]
