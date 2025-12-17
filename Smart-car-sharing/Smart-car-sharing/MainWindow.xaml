@@ -27,6 +27,10 @@
         <DataTemplate DataType="{x:Type viewmodels:CarDetailsViewModel}">
             <views:CarDetailsView />
         </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type viewmodels:MyBookingsViewModel}">
+            <views:MyBookingsView />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid Background="#F0F2F5">

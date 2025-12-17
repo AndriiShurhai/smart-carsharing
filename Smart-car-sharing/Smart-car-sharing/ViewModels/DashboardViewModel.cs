@@ -23,8 +23,16 @@ namespace SmartCarSharingApp.UI.ViewModels
 
         [ObservableProperty]
         private bool isBusy;
+        public Action? RequestNavigateToMyBookings { get; set; }
 
+        // Команда, яку ми прив'яжемо до кнопки
+        [RelayCommand]
+        private void GoToMyBookings()
+        {
+            RequestNavigateToMyBookings?.Invoke();
+        }
         // ====== NAVIGATION ======
+
         public Action<Car>? RequestNavigateToDetails { get; set; }
 
         // ====== CONSTRUCTOR ======
@@ -34,13 +42,13 @@ namespace SmartCarSharingApp.UI.ViewModels
             _ = LoadAllCarsAsync();
         }
 
+
         // ====== COMMANDS ======
 
         [RelayCommand]
         private async Task LoadAllCarsAsync()
         {
             IsBusy = true;
-
             try
             {
                 var result = await _carService.GetAllCarsAsync();
