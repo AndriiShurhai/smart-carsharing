@@ -18,6 +18,10 @@
             <views:RegisterView />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type viewmodels:BookingViewModel}">
+            <views:BookingView />
+        </DataTemplate>
+
         <!-- ДОДАНО: Шаблон для Дашборду -->
         <DataTemplate DataType="{x:Type viewmodels:DashboardViewModel}">
             <views:DashboardView />
