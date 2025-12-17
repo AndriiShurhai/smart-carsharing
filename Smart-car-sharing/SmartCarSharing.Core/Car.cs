@@ -14,5 +14,7 @@ namespace SmartCarSharing.Core
         public int Year { get; set; }
         public decimal PricePerHour { get; set; }
         public string Location { get; set; }
+
+        public string Status { get; set; } = "Available";
     }
 }
