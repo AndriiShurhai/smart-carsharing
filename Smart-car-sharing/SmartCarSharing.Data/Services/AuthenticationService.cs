@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartCarSharing.Core;
 using SmartCarSharing.Core.Services;
+
 using SmartCarSharing.Data;
 using System;
 using System.Threading.Tasks;
-using BCrypt.Net;
+// using BCrypt.Net; // Переконайтеся, що це підключено
 
 namespace SmartCarSharing.Data.Services
 {
@@ -17,7 +18,7 @@ namespace SmartCarSharing.Data.Services
             _context = context;
         }
 
-        public async Task RegisterUserAsync(string name, string email, string password)
+        public async Task RegisterUserAsync(string name, string email, string password, string driverLicense)
         {
             var emailExists = await _context.Users
                 .AnyAsync(u => u.Email.ToLower() == email.ToLower());
@@ -33,7 +34,8 @@ namespace SmartCarSharing.Data.Services
             {
                 Name = name,
                 Email = email,
-                HashedPassword = hashedPassword
+                HashedPassword = hashedPassword,
+                DriverLicenseNumber = driverLicense // Зберігаємо права
             };
 
             _context.Users.Add(newUser);
@@ -45,13 +47,11 @@ namespace SmartCarSharing.Data.Services
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
 
-            if (user == null)
-                return null;
+            if (user == null) return null;
 
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.HashedPassword);
 
-            if (!isPasswordValid)
-                return null;
+            if (!isPasswordValid) return null;
 
             return user;
         }
