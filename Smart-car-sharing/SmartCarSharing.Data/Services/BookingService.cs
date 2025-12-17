@@ -23,7 +23,7 @@ namespace SmartCarSharing.Data.Services
             _logger = logger;
         }
 
-        // --- Метод для отримання бронювань користувача (JOIN з таблицею Cars) ---
+        // --- Метод з вашої гілки (SC-51) ---
         public async Task<List<BookingDto>> GetBookingsByUserIdAsync(int userId)
         {
             _logger.LogInformation("Fetching bookings for user {UserId}", userId);
@@ -49,7 +49,7 @@ namespace SmartCarSharing.Data.Services
             return result;
         }
 
-        // --- Інші методи сервісу ---
+        // --- Методи з гілки dev (збережено) ---
 
         public decimal CalculatePrice(Car car, DateTime start, DateTime end)
         {
@@ -64,11 +64,6 @@ namespace SmartCarSharing.Data.Services
             var car = await _context.Cars.FindAsync(carId);
             if (car == null) throw new ArgumentException("Car not found");
 
-            decimal billableHours = (decimal)hours;
-            return car.PricePerHour * billableHours;
-        }
-
-        public decimal CalculatePrice(Car car, DateTime start, DateTime end)
             return car.PricePerHour * (decimal)hours;
         }
 
@@ -76,20 +71,17 @@ namespace SmartCarSharing.Data.Services
         {
             _logger.LogInformation($"Validating booking for User {userId}, Car {carId}...");
 
-            var duration = end - start;
-            // Округляємо до повної години вгору (мінімум 1 година)
-            var hours = Math.Max(1, Math.Ceiling(duration.TotalHours));
             // --- 1. ПЕРЕВІРКИ КОРИСТУВАЧА ---
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return BookingResult.Failure("Користувача не знайдено.");
 
-            // Rule 3 & 8: Наявність та формат прав
+            // Перевірка наявності прав
             if (string.IsNullOrWhiteSpace(user.DriverLicenseNumber))
             {
                 return BookingResult.Failure("У профілі відсутнє водійське посвідчення.");
             }
 
-            // Простий Regex: Мінімум 5 символів, букви та цифри (можна адаптувати під українські права)
+            // Перевірка формату прав (Regex)
             if (!Regex.IsMatch(user.DriverLicenseNumber, @"^[A-Z0-9]{5,15}$", RegexOptions.IgnoreCase))
             {
                 return BookingResult.Failure("Невірний формат водійського посвідчення (має бути 5-15 літер/цифр).");
@@ -98,25 +90,25 @@ namespace SmartCarSharing.Data.Services
             // --- 2. ПЕРЕВІРКИ ЧАСУ ---
             var now = DateTime.Now;
 
-            // Rule 1: Дата початку не в минулому (даємо 2 хвилини люфту на затримку мережі/кліків)
+            // Не можна бронювати на минуле
             if (start < now.AddMinutes(-2))
             {
                 return BookingResult.Failure("Не можна бронювати на минулий час.");
             }
 
-            // Rule 1.1: Дата закінчення пізніше дати початку
+            // Дата закінчення має бути пізніше початку
             if (end <= start)
             {
                 return BookingResult.Failure("Дата закінчення має бути пізніше дати початку.");
             }
 
-            // Rule 5: Мінімальна тривалість 1 година
+            // Мінімальна тривалість 1 година
             if ((end - start).TotalHours < 1.0)
             {
                 return BookingResult.Failure("Мінімальний час оренди — 1 година.");
             }
 
-            // Rule 6: Максимальне бронювання наперед (6 місяців)
+            // Максимальне бронювання наперед (6 місяців)
             if (start > now.AddMonths(6))
             {
                 return BookingResult.Failure("Бронювання доступне лише на найближчі 6 місяців.");
@@ -126,9 +118,7 @@ namespace SmartCarSharing.Data.Services
             var car = await _context.Cars.FindAsync(carId);
             if (car == null) return BookingResult.Failure("Автомобіль не знайдено.");
 
-            // Rule 4: Перевірка на перетин (Overlapping)
-            // Логіка: Новий інтервал (Start, End) перетинається з існуючим (b.Start, b.End),
-            // якщо (Start < b.End) І (End > b.Start).
+            // Перевірка на перетин дат (Overlapping)
             bool isOccupied = await _context.Bookings
                 .AnyAsync(b => b.CarId == carId &&
                                start < b.EndTime &&
