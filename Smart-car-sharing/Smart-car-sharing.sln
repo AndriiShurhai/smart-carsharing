@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		smartcarsharing.db = smartcarsharing.db
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCarSharing.CLI", "SmartCarSharing.CLI\SmartCarSharing.CLI.csproj", "{ADC95E1B-9DAC-4EFE-A577-4C21A232D98D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{048F4EF4-83E6-4467-BD0E-51456BA0A8F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{048F4EF4-83E6-4467-BD0E-51456BA0A8F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{048F4EF4-83E6-4467-BD0E-51456BA0A8F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADC95E1B-9DAC-4EFE-A577-4C21A232D98D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADC95E1B-9DAC-4EFE-A577-4C21A232D98D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADC95E1B-9DAC-4EFE-A577-4C21A232D98D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADC95E1B-9DAC-4EFE-A577-4C21A232D98D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
