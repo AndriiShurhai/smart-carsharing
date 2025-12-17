@@ -8,9 +8,9 @@ using Serilog;
 using Serilog.Extensions.Logging;
 using SmartCarSharing.Core.Builders;
 using SmartCarSharing.Core;
-using SmartCarSharing.Core.Services;
-using SmartCarSharing.Data.Services;
-
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace SmartCarSharingApp.UI
 {
@@ -52,7 +52,7 @@ namespace SmartCarSharingApp.UI
                 var builder = new CarBuilder();
                 var carsToSeed = new List<Car>();
 
-                var locations =  new[] { "Smila Center", "Smila Airport", "Smila Port", "Smila Railway" };
+                var locations = new[] { "Smila Center", "Smila Airport", "Smila Port", "Smila Railway" };
 
                 var models = new[]
                 {
@@ -92,8 +92,12 @@ namespace SmartCarSharingApp.UI
                 LoggerFactory!.CreateLogger<CarService>()
             );
 
-            var mainViewModel = new MainViewModel(authService, carService);
+            // --- SC-48: Додаємо сервіс бронювання ---
+            IBookingService bookingService = new BookingService(_context);
+            // ----------------------------------------
 
+            // Передаємо всі 3 сервіси у MainViewModel
+            var mainViewModel = new MainViewModel(authService, carService, bookingService);
 
             var mainWindow = new MainWindow
             {
