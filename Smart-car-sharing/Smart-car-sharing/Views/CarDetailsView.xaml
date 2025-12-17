@@ -145,8 +145,10 @@
                             Background="#007ACC"
                             Foreground="White"
                             FontSize="16"
+                            Command="{Binding BookNowCommand}"
                             FontWeight="Bold"
-                            Cursor="Hand">
+                            Cursor="Hand"
+                            >
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8">
