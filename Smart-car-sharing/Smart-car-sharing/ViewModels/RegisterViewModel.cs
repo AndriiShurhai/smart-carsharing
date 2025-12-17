@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCarSharing.Core.Services;
+
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -10,7 +11,6 @@ namespace SmartCarSharingApp.UI.ViewModels
     public partial class RegisterViewModel : ObservableObject
     {
         private readonly IAuthenticationService _authService;
-
         public Action? RequestNavigateToLogin { get; set; }
 
         public RegisterViewModel(IAuthenticationService authService)
@@ -25,6 +25,11 @@ namespace SmartCarSharingApp.UI.ViewModels
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
         private string email = string.Empty;
+
+        // НОВЕ ПОЛЕ
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
+        private string driverLicense = string.Empty;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
@@ -45,14 +50,18 @@ namespace SmartCarSharingApp.UI.ViewModels
         {
             bool isFilled = !string.IsNullOrWhiteSpace(Name) &&
                             !string.IsNullOrWhiteSpace(Email) &&
+                            !string.IsNullOrWhiteSpace(DriverLicense) && // Перевірка
                             !string.IsNullOrWhiteSpace(Password) &&
                             !string.IsNullOrWhiteSpace(ConfirmPassword);
 
-            // Basic email regex
             bool isEmailValid = Regex.IsMatch(Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+
+            // Валідація прав на стороні UI (візуальна)
+            bool isLicenseValid = Regex.IsMatch(DriverLicense, @"^[A-Z0-9]{5,15}$", RegexOptions.IgnoreCase);
+
             bool passwordsMatch = Password == ConfirmPassword;
 
-            return isFilled && isEmailValid && passwordsMatch && !IsBusy;
+            return isFilled && isEmailValid && isLicenseValid && passwordsMatch && !IsBusy;
         }
 
         [RelayCommand(CanExecute = nameof(CanRegister))]
@@ -69,17 +78,14 @@ namespace SmartCarSharingApp.UI.ViewModels
                     return;
                 }
 
-                await _authService.RegisterUserAsync(Name, Email, Password);
+                // Передаємо права у сервіс
+                await _authService.RegisterUserAsync(Name, Email, Password, DriverLicense);
 
                 RequestNavigateToLogin?.Invoke();
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
                 ErrorMessage = ex.Message;
-            }
-            catch (Exception)
-            {
-                ErrorMessage = "Сталася невідома помилка. Спробуйте пізніше.";
             }
             finally
             {

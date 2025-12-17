@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SmartCarSharing.Core
+﻿namespace SmartCarSharing.Core
 {
     public class User
     {
@@ -12,5 +6,6 @@ namespace SmartCarSharing.Core
         public string Name { get; set; }
         public string Email { get; set; }
         public string HashedPassword { get; set; }
+        public string DriverLicenseNumber { get; set; } = string.Empty;
     }
 }
