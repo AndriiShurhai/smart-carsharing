@@ -1,78 +1,74 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using SmartCarSharing.Core; // Додано для класу Car
+using SmartCarSharing.Core;
 using SmartCarSharing.Core.Services;
 using SmartCarSharing.Data.Services;
 using System;
+using System.Windows;
 
 namespace SmartCarSharingApp.UI.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
+        // --- Сервіси ---
         private readonly IAuthenticationService _authService;
+        private readonly ICarService _carService;
+        private readonly IBookingService _bookingService; // Новий сервіс
 
-        // Child ViewModels
+        // --- Дочірні ViewModels ---
         private readonly LoginViewModel _loginViewModel;
         private readonly RegisterViewModel _registerViewModel;
         private readonly DashboardViewModel _dashboardViewModel;
-        private CarDetailsViewModel _carDetailsViewModel; // Створюється динамічно
-        private readonly MyBookingsViewModel _myBookingsViewModel; 
+        private readonly MyBookingsViewModel _myBookingsViewModel;
 
+        // Ці створюються динамічно, бо залежать від конкретного авто
+        private CarDetailsViewModel _carDetailsViewModel;
+        private BookingViewModel _bookingViewModel;
+
+        // --- Поточна ViewModel (для відображення в ContentControl) ---
         [ObservableProperty]
         private object _currentViewModel;
 
-        private readonly ICarService _carService;
-
-        private BookingViewModel _bookingViewModel;
-
-        private void NavigateToBooking(Car car)
-        {
-            _bookingViewModel = new BookingViewModel(car);
-
-            // Логіка кнопок у вікні бронювання
-            _bookingViewModel.RequestCancel += () =>
-            {
-                // При скасуванні повертаємось до деталей авто
-                NavigateToCarDetails(car);
-            };
-
-            _bookingViewModel.RequestConfirm += () =>
-            {
-                // При успіху можна повернутись на Dashboard
-                System.Windows.MessageBox.Show("Бронювання успішно створено! (Демо)", "Успіх");
-                CurrentViewModel = _dashboardViewModel;
-            };
-
-            CurrentViewModel = _bookingViewModel;
-        }
-
         public MainViewModel(
             IAuthenticationService authService,
-            ICarService carService)
+            ICarService carService,
+            IBookingService bookingService) // Отримуємо сервіс через конструктор
         {
             _authService = authService;
             _carService = carService;
+            _bookingService = bookingService;
 
+            // Ініціалізація постійних VM
             _loginViewModel = new LoginViewModel(_authService);
             _registerViewModel = new RegisterViewModel(_authService);
             _dashboardViewModel = new DashboardViewModel(_carService);
             _myBookingsViewModel = new MyBookingsViewModel();
 
+            // --- Налаштування навігації ---
+
+            // 1. Логін -> Реєстрація
+            _loginViewModel.RequestNavigateToRegister += () => CurrentViewModel = _registerViewModel;
+
+            // 2. Реєстрація -> Логін
+            _registerViewModel.RequestNavigateToLogin += () => CurrentViewModel = _loginViewModel;
+
+            // *Тимчасово*: Після успішного логіну можна перемикати на Dashboard (логіку додамо пізніше або вручну)
+            // Поки що стартуємо з Dashboard для зручності розробки, 
+            // але в реальному застосунку стартували б з _loginViewModel.
+
+            // 3. Dashboard -> Деталі авто
             _dashboardViewModel.RequestNavigateToDetails += NavigateToCarDetails;
 
+            // 4. Dashboard -> Мої бронювання
             _dashboardViewModel.RequestNavigateToMyBookings += () =>
             {
+                // Тут можна було б оновити дані в _myBookingsViewModel перед показом
                 CurrentViewModel = _myBookingsViewModel;
             };
 
-            _myBookingsViewModel.RequestGoBack += () =>
-            {
-                CurrentViewModel = _dashboardViewModel;
-            };
+            // 5. Мої бронювання -> Назад (на Dashboard)
+            _myBookingsViewModel.RequestGoBack += () => CurrentViewModel = _dashboardViewModel;
 
-            _loginViewModel.RequestNavigateToRegister += () => CurrentViewModel = _registerViewModel;
-            _registerViewModel.RequestNavigateToLogin += () => CurrentViewModel = _loginViewModel;
-
+            // Встановлюємо стартовий екран
             CurrentViewModel = _dashboardViewModel;
         }
 
@@ -80,13 +76,35 @@ namespace SmartCarSharingApp.UI.ViewModels
         {
             _carDetailsViewModel = new CarDetailsViewModel(car);
 
-            // Навігація назад
+            // Навігація назад до списку
             _carDetailsViewModel.RequestGoBack += () => CurrentViewModel = _dashboardViewModel;
 
-            // --- ДОДАНО: Навігація до бронювання ---
+            // Навігація до бронювання
             _carDetailsViewModel.RequestNavigateToBooking += NavigateToBooking;
 
             CurrentViewModel = _carDetailsViewModel;
+        }
+
+        private void NavigateToBooking(Car car)
+        {
+            // Створюємо VM для бронювання, передаючи авто ТА сервіс
+            _bookingViewModel = new BookingViewModel(car, _bookingService);
+
+            // Логіка кнопки "Скасувати"
+            _bookingViewModel.RequestCancel += () =>
+            {
+                // Повертаємось до деталей цього авто
+                NavigateToCarDetails(car);
+            };
+
+            // Логіка успішного підтвердження
+            _bookingViewModel.RequestConfirm += () =>
+            {
+                // Повертаємось на головну (Dashboard)
+                CurrentViewModel = _dashboardViewModel;
+            };
+
+            CurrentViewModel = _bookingViewModel;
         }
     }
 }
