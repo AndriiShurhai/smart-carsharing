@@ -31,6 +31,8 @@ namespace SmartCarSharingApp.Tests
                            .ReturnsAsync(expectedCars);
 
             var viewModel = new DashboardViewModel(_mockCarService.Object);
+
+            // Чекаємо трохи, бо LoadAllCarsAsync викликається в конструкторі без await
             await Task.Delay(50);
 
             Assert.NotNull(viewModel.Cars);
@@ -59,16 +61,20 @@ namespace SmartCarSharingApp.Tests
         }
 
         [Fact]
-        public void OpenDetailsCommand_ShouldTrigger_RequestNavigateToDetails()
+        public void ViewDetailsCommand_ShouldTrigger_RequestNavigateToDetails()
         {
+            // Arrange
             var viewModel = new DashboardViewModel(_mockCarService.Object);
             var testCar = new Car { Id = 1, Make = "Test" };
             Car? navigatedCar = null;
 
             viewModel.RequestNavigateToDetails = (car) => navigatedCar = car;
 
-            viewModel.OpenDetailsCommand.Execute(testCar);
+            // Act
+            // ВИПРАВЛЕНО: Було OpenDetailsCommand, стало ViewDetailsCommand
+            viewModel.ViewDetailsCommand.Execute(testCar);
 
+            // Assert
             Assert.Equal(testCar, navigatedCar);
         }
 
@@ -80,12 +86,13 @@ namespace SmartCarSharingApp.Tests
 
             var viewModel = new DashboardViewModel(_mockCarService.Object);
 
+            
             Assert.True(viewModel.IsBusy);
 
             tcs.SetResult(new List<Car>());
             await Task.Delay(10);
 
-            Assert.False(viewModel.IsBusy); 
+            Assert.False(viewModel.IsBusy);
         }
     }
 }

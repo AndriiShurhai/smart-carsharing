@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using SmartCarSharing.Core;
 using SmartCarSharing.Core.Services;
-using SmartCarSharing.Data.Services;
+using SmartCarSharing.Data.Services; // Якщо потрібно для namespace
 using System;
 using System.Windows;
 
@@ -51,9 +51,7 @@ namespace SmartCarSharingApp.UI.ViewModels
             // 2. Реєстрація -> Логін
             _registerViewModel.RequestNavigateToLogin += () => CurrentViewModel = _loginViewModel;
 
-            // *Тимчасово*: Після успішного логіну можна перемикати на Dashboard (логіку додамо пізніше або вручну)
-            // Поки що стартуємо з Dashboard для зручності розробки, 
-            // але в реальному застосунку стартували б з _loginViewModel.
+            _loginViewModel.RequestNavigateToDashboard += () => CurrentViewModel = _dashboardViewModel;
 
             // 3. Dashboard -> Деталі авто
             _dashboardViewModel.RequestNavigateToDetails += NavigateToCarDetails;
@@ -69,7 +67,7 @@ namespace SmartCarSharingApp.UI.ViewModels
             _myBookingsViewModel.RequestGoBack += () => CurrentViewModel = _dashboardViewModel;
 
             // Встановлюємо стартовий екран
-            CurrentViewModel = _dashboardViewModel;
+            CurrentViewModel = _loginViewModel;
         }
 
         private void NavigateToCarDetails(Car car)
@@ -81,7 +79,6 @@ namespace SmartCarSharingApp.UI.ViewModels
 
             // Навігація до бронювання
             _carDetailsViewModel.RequestNavigateToBooking += NavigateToBooking;
-
             CurrentViewModel = _carDetailsViewModel;
         }
 

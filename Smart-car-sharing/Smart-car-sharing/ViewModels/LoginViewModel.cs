@@ -14,6 +14,9 @@ namespace SmartCarSharingApp.UI.ViewModels
 
         public Action RequestNavigateToRegister { get; set; }
 
+        // 1. ДОДАНО: Подія для переходу на Дашборд
+        public Action RequestNavigateToDashboard { get; set; }
+
         public LoginViewModel(IAuthenticationService authService)
         {
             _authService = authService;
@@ -57,9 +60,10 @@ namespace SmartCarSharingApp.UI.ViewModels
 
                 AppState.CurrentUser = user;
 
-                MessageBox.Show($"Вітаємо, {user.Name}!", "Успішний вхід");
+                // MessageBox.Show($"Вітаємо, {user.Name}!", "Успішний вхід"); // Можна прибрати, щоб не дратувало
 
-                // Here we would navigate to the Dashboard/Home view usually
+                // 2. ДОДАНО: Перемикаємо екран на Дашборд
+                RequestNavigateToDashboard?.Invoke();
             }
             catch (Exception ex)
             {
