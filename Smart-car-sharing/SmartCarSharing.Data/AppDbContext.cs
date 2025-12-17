@@ -27,7 +27,7 @@ namespace SmartCarSharing.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite("DataSource=../smartcarsharing.db");
+                optionsBuilder.UseSqlite("DataSource=../../../../smartcarsharing.db");
             }
         }
     }
