@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCarSharing.Core;
-using SmartCarSharing.Core.Services; // Додано
+using SmartCarSharing.Core.Services;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,12 +11,11 @@ namespace SmartCarSharingApp.UI.ViewModels
     public partial class BookingViewModel : ObservableObject
     {
         private readonly Car _car;
-        private readonly IBookingService _bookingService; // Додано залежність
+        private readonly IBookingService _bookingService;
 
         public Action? RequestCancel { get; set; }
         public Action? RequestConfirm { get; set; }
 
-        // Конструктор тепер приймає сервіс
         public BookingViewModel(Car car, IBookingService bookingService)
         {
             _car = car ?? throw new ArgumentNullException(nameof(car));
@@ -39,9 +38,10 @@ namespace SmartCarSharingApp.UI.ViewModels
         private DateTime _endDate;
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(ConfirmCommand))] // Updated: Notify command when price changes
         private decimal _totalPrice;
 
-        [ObservableProperty] // Для блокування кнопки під час запиту
+        [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(ConfirmCommand))]
         private bool _isBusy;
 
@@ -52,12 +52,15 @@ namespace SmartCarSharingApp.UI.ViewModels
 
         private void CalculatePrice()
         {
-            // Використовуємо синхронну логіку для швидкого відображення в UI,
-            // але логіка така сама, як в сервісі.
+            // Delegates logic to the service
             TotalPrice = _bookingService.CalculatePrice(_car, StartDate, EndDate);
         }
 
-        private bool CanConfirm() => !IsBusy;
+        // Updated: Button is disabled if Price is 0 (invalid dates) or app is busy
+        private bool CanConfirm()
+        {
+            return !IsBusy && TotalPrice > 0;
+        }
 
         [RelayCommand(CanExecute = nameof(CanConfirm))]
         private async Task ConfirmAsync()
@@ -72,7 +75,6 @@ namespace SmartCarSharingApp.UI.ViewModels
 
             try
             {
-                // Виклик сервісу
                 var result = await _bookingService.CreateBookingAsync(
                     AppState.CurrentUser.Id,
                     _car.Id,
