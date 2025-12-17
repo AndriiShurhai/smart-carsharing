@@ -1,22 +1,22 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCarSharing.Core;
-using SmartCarSharing.Core.Services; // ! Важливо
+using SmartCarSharing.Core.Services; // Додано
 using System;
 using System.Threading.Tasks;
-using System.Windows; // Для MessageBox
+using System.Windows;
 
 namespace SmartCarSharingApp.UI.ViewModels
 {
     public partial class BookingViewModel : ObservableObject
     {
         private readonly Car _car;
-        private readonly IBookingService _bookingService; // ! Додано залежність
+        private readonly IBookingService _bookingService; // Додано залежність
 
         public Action? RequestCancel { get; set; }
         public Action? RequestConfirm { get; set; }
 
-        // ! Конструктор змінено: додано bookingService
+        // Конструктор тепер приймає сервіс
         public BookingViewModel(Car car, IBookingService bookingService)
         {
             _car = car ?? throw new ArgumentNullException(nameof(car));
@@ -41,7 +41,7 @@ namespace SmartCarSharingApp.UI.ViewModels
         [ObservableProperty]
         private decimal _totalPrice;
 
-        [ObservableProperty] // ! Додано, щоб блокувати кнопку, поки йде запит
+        [ObservableProperty] // Для блокування кнопки під час запиту
         [NotifyCanExecuteChangedFor(nameof(ConfirmCommand))]
         private bool _isBusy;
 
@@ -52,62 +52,50 @@ namespace SmartCarSharingApp.UI.ViewModels
 
         private void CalculatePrice()
         {
-            if (EndDate < StartDate)
-            {
-                TotalPrice = 0;
-                return;
-            }
-            var duration = EndDate - StartDate;
-            var hours = Math.Max(1, Math.Ceiling(duration.TotalHours));
-            TotalPrice = (decimal)hours * _car.PricePerHour;
+            // Використовуємо синхронну логіку для швидкого відображення в UI,
+            // але логіка така сама, як в сервісі.
+            TotalPrice = _bookingService.CalculatePrice(_car, StartDate, EndDate);
         }
 
-        // ! Перевірка для команди: чи можна натиснути кнопку?
-        private bool CanConfirm()
-        {
-            return !IsBusy && TotalPrice > 0;
-        }
+        private bool CanConfirm() => !IsBusy;
 
-        // ! Оновлена команда Confirm (тепер асинхронна)
         [RelayCommand(CanExecute = nameof(CanConfirm))]
         private async Task ConfirmAsync()
         {
-            // Перевірка авторизації
             if (AppState.CurrentUser == null)
             {
-                MessageBox.Show("Будь ласка, увійдіть у систему, щоб забронювати авто.", "Помилка");
+                MessageBox.Show("Помилка: Користувач не авторизований.", "Помилка");
                 return;
             }
 
-            IsBusy = true; // Блокуємо кнопку
+            IsBusy = true;
 
             try
             {
-                // Створюємо об'єкт бронювання
-                var booking = new Booking
+                // Виклик сервісу
+                var result = await _bookingService.CreateBookingAsync(
+                    AppState.CurrentUser.Id,
+                    _car.Id,
+                    StartDate,
+                    EndDate);
+
+                if (result.IsSuccess)
                 {
-                    CarId = _car.Id,
-                    UserId = AppState.CurrentUser.Id,
-                    StartTime = StartDate,
-                    EndTime = EndDate,
-                    TotalCost = TotalPrice
-                };
-
-                // Викликаємо сервіс (зберігаємо в БД)
-                await _bookingService.CreateBookingAsync(booking);
-
-                MessageBox.Show("Успіх! Автомобіль заброньовано.", "Бронювання");
-
-                // Повертаємось на головну
-                RequestConfirm?.Invoke();
+                    MessageBox.Show($"Бронювання успішне! Вартість: {result.Booking.TotalCost:C}", "Успіх");
+                    RequestConfirm?.Invoke();
+                }
+                else
+                {
+                    MessageBox.Show(result.Message, "Помилка бронювання");
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Помилка при бронюванні: {ex.Message}", "Помилка");
+                MessageBox.Show($"Критична помилка: {ex.Message}", "Помилка");
             }
             finally
             {
-                IsBusy = false; // Розблокуємо кнопку
+                IsBusy = false;
             }
         }
 
