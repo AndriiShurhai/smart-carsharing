@@ -23,12 +23,13 @@ namespace SmartCarSharingApp.Tests
         {
             _viewModel.Name = "Andrii";
             _viewModel.Email = "test@example.com";
+            _viewModel.DriverLicense = "ABC12345"; 
             _viewModel.Password = "securePass123";
-            _viewModel.ConfirmPassword = "securePass123"; 
+            _viewModel.ConfirmPassword = "securePass123";
 
             await _viewModel.RegisterCommand.ExecuteAsync(null);
 
-            _mockAuthService.Verify(s => s.RegisterUserAsync("Andrii", "test@example.com", "securePass123"), Times.Once);
+            _mockAuthService.Verify(s => s.RegisterUserAsync("Andrii", "test@example.com", "securePass123", "ABC12345"), Times.Once);
         }
 
         [Fact]
@@ -36,6 +37,7 @@ namespace SmartCarSharingApp.Tests
         {
             _viewModel.Name = "Test";
             _viewModel.Email = "test@test.com";
+            _viewModel.DriverLicense = "ABC12345"; 
             _viewModel.Password = "123456";
             _viewModel.ConfirmPassword = "654321"; 
 
@@ -47,8 +49,9 @@ namespace SmartCarSharingApp.Tests
         [Fact]
         public void RegisterCommand_CanExecute_ShouldBeFalse_WhenAnyFieldIsEmpty()
         {
-            _viewModel.Name = "";
+            _viewModel.Name = ""; 
             _viewModel.Email = "test@test.com";
+            _viewModel.DriverLicense = "ABC12345";
             _viewModel.Password = "123";
             _viewModel.ConfirmPassword = "123";
 
@@ -62,11 +65,12 @@ namespace SmartCarSharingApp.Tests
         {
             _viewModel.Name = "Test";
             _viewModel.Email = "exist@test.com";
+            _viewModel.DriverLicense = "ABC12345";
             _viewModel.Password = "123";
             _viewModel.ConfirmPassword = "123";
 
             _mockAuthService
-                .Setup(s => s.RegisterUserAsync(It.IsAny<string>(), "exist@test.com", It.IsAny<string>()))
+                .Setup(s => s.RegisterUserAsync(It.IsAny<string>(), "exist@test.com", It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new InvalidOperationException("Користувач вже існує"));
 
             await _viewModel.RegisterCommand.ExecuteAsync(null);
