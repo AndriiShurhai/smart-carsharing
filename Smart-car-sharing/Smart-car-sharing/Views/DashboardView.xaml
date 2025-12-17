@@ -15,12 +15,9 @@
     <Grid Background="#F0F2F5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Пошук -->
             <RowDefinition Height="*"/>
-            <!-- Список авто -->
-        </Grid.RowDefinitions>
+            </Grid.RowDefinitions>
 
-        <!-- 1. Верхня панель з пошуком -->
         <Border Grid.Row="0" Background="White" Padding="20,15" BorderBrush="#E5E5E5" BorderThickness="0,0,0,1">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -34,56 +31,65 @@
                            VerticalAlignment="Center"
                            Foreground="#333"/>
 
-                <!-- Пошук справа -->
-                <Border Grid.Column="1" 
-                        Background="#F5F7FA" 
-                        CornerRadius="20" 
-                        Width="300" 
-                        Height="40">
-                    <Grid>
-                        <TextBlock Text="🔍" 
-                                   HorizontalAlignment="Left" 
-                                   VerticalAlignment="Center" 
-                                   Margin="15,0,0,0" 
-                                   Opacity="0.5"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    
+                    <Border Background="#F5F7FA" 
+                            CornerRadius="20" 
+                            Width="300" 
+                            Height="40">
+                        <Grid>
+                            <TextBlock Text="🔍" 
+                                       HorizontalAlignment="Left" 
+                                       VerticalAlignment="Center" 
+                                       Margin="15,0,0,0" 
+                                       Opacity="0.5"/>
 
-                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                                 VerticalAlignment="Center"
-                                 Margin="40,0,10,0"
-                                 BorderThickness="0"
-                                 Background="Transparent"
-                                 FontSize="14"
-                                 Padding="0"
-                                 VerticalContentAlignment="Center"/>
-                    </Grid>
-                </Border>
+                            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                     VerticalAlignment="Center"
+                                     Margin="40,0,10,0"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     FontSize="14"
+                                     Padding="0"
+                                     VerticalContentAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <Button Content="📅 Мої бронювання"
+                            Command="{Binding GoToMyBookingsCommand}"
+                            Margin="15,0,0,0"
+                            Padding="15,8"
+                            Background="#007ACC"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            BorderThickness="0"
+                            Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="8"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+
+                </StackPanel>
             </Grid>
         </Border>
 
-        <!-- 2. Список автомобілів -->
         <ScrollViewer Grid.Row="1" Padding="20">
-            <!-- ItemsControl відображає список без можливості виділення рядка (як у ListBox), що краще для карток -->
             <ItemsControl ItemsSource="{Binding Cars}">
-
-                <!-- ItemsPanel: WrapPanel змушує елементи переноситись на новий рядок -->
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
-                <!-- ItemTemplate: Вигляд кожного елемента списку -->
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <!-- Використовуємо наш CarCard. 
-                             Прив'язуємо команду ViewDetailsCommand з DashboardViewModel.
-                             Передаємо поточний об'єкт (Car) як параметр. -->
                         <local:CarCard Margin="0,0,20,20"
                                        Command="{Binding DataContext.ViewDetailsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                        CommandParameter="{Binding}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-
             </ItemsControl>
         </ScrollViewer>
     </Grid>

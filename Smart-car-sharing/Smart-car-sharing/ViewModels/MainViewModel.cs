@@ -19,6 +19,8 @@ namespace SmartCarSharingApp.UI.ViewModels
         private readonly DashboardViewModel _dashboardViewModel;
         private CarDetailsViewModel _carDetailsViewModel;
         private BookingViewModel _bookingViewModel;
+        private CarDetailsViewModel _carDetailsViewModel; // Створюється динамічно
+        private readonly MyBookingsViewModel _myBookingsViewModel; 
 
         [ObservableProperty]
         private object _currentViewModel;
@@ -36,6 +38,7 @@ namespace SmartCarSharingApp.UI.ViewModels
             _loginViewModel = new LoginViewModel(_authService);
             _registerViewModel = new RegisterViewModel(_authService);
             _dashboardViewModel = new DashboardViewModel(_carService);
+            _myBookingsViewModel = new MyBookingsViewModel();
 
             // --- НАЛАШТУВАННЯ НАВІГАЦІЇ ---
 
