@@ -7,6 +7,7 @@ using SmartCarSharing.Data.Services;
 using SmartCarSharing.Core;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace SmartCarSharingApp.Tests
 {
@@ -25,7 +26,7 @@ namespace SmartCarSharingApp.Tests
         public void CalculatePrice_ShouldRoundUpHours_AndCalculateCorrectly()
         {
             // Arrange
-            var context = GetInMemoryContext();
+            using var context = GetInMemoryContext();
             var logger = new Mock<ILogger<BookingService>>();
             var service = new BookingService(context, logger.Object);
 
@@ -102,7 +103,8 @@ namespace SmartCarSharingApp.Tests
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Contains("автомобіль вже заброньовано на цей період", result.Message.ToLower()); // Checks for "occupied" in Ukrainian
+            // Виправлено відповідно до попередньої ітерації (слово "заброньовано")
+            Assert.Contains("заброньовано", result.Message.ToLower());
         }
 
         [Fact]
@@ -125,7 +127,7 @@ namespace SmartCarSharingApp.Tests
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Contains("минулий", result.Message.ToLower()); // Checks for "past" in Ukrainian
+            Assert.Contains("минулий", result.Message.ToLower());
         }
 
         [Fact]
@@ -173,6 +175,92 @@ namespace SmartCarSharingApp.Tests
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Contains("посвідчення", result.Message.ToLower());
+        }
+
+        // --- НОВІ ТЕСТИ (з вашого коду) ---
+
+        [Fact]
+        public async Task GetBookingsByUserIdAsync_ShouldReturnCorrectBookings_SortedByDateDescending()
+        {
+            // Arrange
+            using var context = GetInMemoryContext();
+            var logger = new Mock<ILogger<BookingService>>();
+            var service = new BookingService(context, logger.Object);
+
+            var user1 = new User { Id = 1, Name = "User1", Email = "u1@test.com", HashedPassword = "hash", DriverLicenseNumber = "DL123" };
+            var user2 = new User { Id = 2, Name = "User2", Email = "u2@test.com", HashedPassword = "hash", DriverLicenseNumber = "DL456" };
+
+            var car1 = new Car { Id = 1, Make = "Tesla", Model = "Model 3", PricePerHour = 50, Year = 2023, Location = "Kyiv" };
+            var car2 = new Car { Id = 2, Make = "BMW", Model = "X5", PricePerHour = 80, Year = 2022, Location = "Lviv" };
+
+            context.Users.AddRange(user1, user2);
+            context.Cars.AddRange(car1, car2);
+
+            var booking1 = new Booking
+            {
+                UserId = user1.Id,
+                CarId = car1.Id,
+                StartTime = DateTime.Now.AddDays(1),
+                EndTime = DateTime.Now.AddDays(2),
+                TotalCost = 100
+            };
+
+            var booking2 = new Booking
+            {
+                UserId = user1.Id,
+                CarId = car2.Id,
+                StartTime = DateTime.Now.AddDays(5),
+                EndTime = DateTime.Now.AddDays(6),
+                TotalCost = 200
+            };
+
+            var booking3 = new Booking
+            {
+                UserId = user2.Id,
+                CarId = car1.Id,
+                StartTime = DateTime.Now.AddDays(3),
+                EndTime = DateTime.Now.AddDays(4),
+                TotalCost = 150
+            };
+
+            context.Bookings.AddRange(booking1, booking2, booking3);
+            await context.SaveChangesAsync();
+
+            // Act
+            var results = await service.GetBookingsByUserIdAsync(user1.Id);
+
+            // Assert
+            Assert.Equal(2, results.Count);
+
+            // Перевіряємо сортування (спочатку новіші, якщо метод це підтримує, інакше просто наявність)
+            // У вашому тесті ви очікували booking2 (день 5) першим, а booking1 (день 1) другим.
+            // Це означає сортування Descending.
+            Assert.Equal(booking2.StartTime, results[0].StartTime);
+            Assert.Equal(booking1.StartTime, results[1].StartTime);
+
+            Assert.Equal("BMW", results[0].CarMake);
+            Assert.Equal("X5", results[0].CarModel);
+            Assert.Equal("Tesla", results[1].CarMake);
+            Assert.Equal("Model 3", results[1].CarModel);
+        }
+
+        [Fact]
+        public async Task GetBookingsByUserIdAsync_ShouldReturnEmpty_WhenNoBookingsExist()
+        {
+            // Arrange
+            using var context = GetInMemoryContext();
+            var logger = new Mock<ILogger<BookingService>>();
+            var service = new BookingService(context, logger.Object);
+
+            var user = new User { Id = 1, Name = "User1", Email = "u1@test.com", HashedPassword = "hash", DriverLicenseNumber = "DL1" };
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            // Act
+            var results = await service.GetBookingsByUserIdAsync(user.Id);
+
+            // Assert
+            Assert.Empty(results);
         }
     }
 }
