@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SmartCarSharing.Core;
+using SmartCarSharing.Core.DTOs;
 using SmartCarSharing.Core.Services;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SmartCarSharing.Data.Services
@@ -18,32 +21,49 @@ namespace SmartCarSharing.Data.Services
             _logger = logger;
         }
 
-        // ЗМІНЕНО: Приймаємо години (double), а не дні
+        // --- Метод для отримання бронювань користувача (JOIN з таблицею Cars) ---
+        public async Task<List<BookingDto>> GetBookingsByUserIdAsync(int userId)
+        {
+            _logger.LogInformation("Fetching bookings for user {UserId}", userId);
+
+            // Використовуємо JOIN, щоб отримати назву авто разом з даними про бронювання
+            var query = from b in _context.Bookings
+                        join c in _context.Cars on b.CarId equals c.Id
+                        where b.UserId == userId
+                        orderby b.StartTime descending // Сортуємо: найновіші зверху
+                        select new BookingDto
+                        {
+                            Id = b.Id,
+                            CarMake = c.Make,
+                            CarModel = c.Model,
+                            StartTime = b.StartTime,
+                            EndTime = b.EndTime,
+                            TotalCost = b.TotalCost
+                        };
+
+            var result = await query.ToListAsync();
+            _logger.LogInformation("Found {Count} bookings for user {UserId}", result.Count, userId);
+
+            return result;
+        }
+
+        // --- Інші методи сервісу ---
+
         public async Task<decimal> CalculatePriceAsync(int carId, double hours)
         {
             var car = await _context.Cars.FindAsync(carId);
             if (car == null) throw new ArgumentException("Car not found");
 
-            // Логіка: Ціна за годину * кількість годин
-            // Math.Ceiling округлює вгору (наприклад, 1.2 години = 2 години оплати),
-            // але можна прибрати Ceiling, якщо хочете точну оплату за хвилини.
-            // Для каршерингу часто округлюють до хвилини, але поки лишимо години:
-
             decimal billableHours = (decimal)hours;
-
             return car.PricePerHour * billableHours;
         }
 
-        // Цей метод вже був правильним, але переконаємось
         public decimal CalculatePrice(Car car, DateTime start, DateTime end)
         {
             if (end <= start) return 0;
 
             var duration = end - start;
-
-            // TotalHours повертає дробове число (наприклад 1.5 для півтори години)
-            // Використовуємо Math.Ceiling, щоб округлити до повної години в більшу сторону
-            // (1 година 10 хв = оплата за 2 години)
+            // Округляємо до повної години вгору (мінімум 1 година)
             var hours = Math.Max(1, Math.Ceiling(duration.TotalHours));
 
             return (decimal)hours * car.PricePerHour;
@@ -57,7 +77,7 @@ namespace SmartCarSharing.Data.Services
             {
                 return BookingResult.Failure("Дата закінчення має бути пізніше дати початку.");
             }
-            if (start < DateTime.Now.AddMinutes(-5)) // Даємо 5 хв "люфту"
+            if (start < DateTime.Now.AddMinutes(-5))
             {
                 return BookingResult.Failure("Не можна бронювати на минулий час.");
             }
@@ -68,7 +88,7 @@ namespace SmartCarSharing.Data.Services
                 return BookingResult.Failure("Автомобіль не знайдено.");
             }
 
-            // Перевірка перетинів (залишається без змін)
+            // Перевірка на перетин дат
             bool isOccupied = await _context.Bookings
                 .AnyAsync(b => b.CarId == carId &&
                                start < b.EndTime &&
