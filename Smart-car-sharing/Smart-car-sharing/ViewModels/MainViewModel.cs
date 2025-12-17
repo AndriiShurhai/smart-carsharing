@@ -22,6 +22,29 @@ namespace SmartCarSharingApp.UI.ViewModels
 
         private readonly ICarService _carService;
 
+        private BookingViewModel _bookingViewModel;
+
+        private void NavigateToBooking(Car car)
+        {
+            _bookingViewModel = new BookingViewModel(car);
+
+            // Логіка кнопок у вікні бронювання
+            _bookingViewModel.RequestCancel += () =>
+            {
+                // При скасуванні повертаємось до деталей авто
+                NavigateToCarDetails(car);
+            };
+
+            _bookingViewModel.RequestConfirm += () =>
+            {
+                // При успіху можна повернутись на Dashboard
+                System.Windows.MessageBox.Show("Бронювання успішно створено! (Демо)", "Успіх");
+                CurrentViewModel = _dashboardViewModel;
+            };
+
+            CurrentViewModel = _bookingViewModel;
+        }
+
         public MainViewModel(
             IAuthenticationService authService,
             ICarService carService)
@@ -38,14 +61,15 @@ namespace SmartCarSharingApp.UI.ViewModels
             CurrentViewModel = _dashboardViewModel;
         }
 
-
         private void NavigateToCarDetails(Car car)
         {
-            // Створюємо VM деталей для конкретного авто
             _carDetailsViewModel = new CarDetailsViewModel(car);
 
-            // Налаштовуємо кнопку "Назад"
+            // Навігація назад
             _carDetailsViewModel.RequestGoBack += () => CurrentViewModel = _dashboardViewModel;
+
+            // --- ДОДАНО: Навігація до бронювання ---
+            _carDetailsViewModel.RequestNavigateToBooking += NavigateToBooking;
 
             CurrentViewModel = _carDetailsViewModel;
         }
