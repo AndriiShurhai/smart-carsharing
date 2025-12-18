@@ -47,6 +47,8 @@ namespace SmartCarSharingApp.UI.ViewModels
         public int Year => _car.Year;
         public decimal Price => _car.PricePerHour;
 
+        public string Status => _car.Status;
+
         [RelayCommand]
         private void GoBack()
         {

@@ -1,13 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SmartCarSharing.Core;
+using SmartCarSharing.Core.Services; // Added
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace SmartCarSharingApp.UI.ViewModels
 {
-    // Допоміжний клас для відображення рядка в таблиці
     public class BookingItem
     {
         public int Id { get; set; }
@@ -16,7 +17,6 @@ namespace SmartCarSharingApp.UI.ViewModels
         public DateTime EndTime { get; set; }
         public decimal TotalCost { get; set; }
 
-        // Вираховуємо статус на основі часу
         public string Status
         {
             get
@@ -31,6 +31,8 @@ namespace SmartCarSharingApp.UI.ViewModels
 
     public partial class MyBookingsViewModel : ObservableObject
     {
+        private readonly IBookingService _bookingService; // Added Service
+
         [ObservableProperty]
         private ObservableCollection<BookingItem> _bookings = new();
 
@@ -39,48 +41,51 @@ namespace SmartCarSharingApp.UI.ViewModels
 
         public Action? RequestGoBack { get; set; }
 
-        public MyBookingsViewModel()
+        // Inject IBookingService into the constructor
+        public MyBookingsViewModel(IBookingService bookingService)
         {
-            // У реальному додатку тут ми б викликали сервіс: _bookingService.GetForUser(userId)
-            // Зараз завантажимо тестові дані для перевірки UI
-            LoadMockData();
+            _bookingService = bookingService;
         }
 
-        private void LoadMockData()
+        // Method to load real data from DB
+        public async Task LoadDataAsync()
         {
+            if (IsBusy) return;
             IsBusy = true;
 
-            Bookings = new ObservableCollection<BookingItem>
+            try
             {
-                new BookingItem
+                var currentUser = AppState.CurrentUser;
+                if (currentUser == null)
                 {
-                    Id = 1,
-                    CarName = "Tesla Model 3",
-                    StartTime = DateTime.Now.AddHours(-1), // Почалася годину тому
-                    EndTime = DateTime.Now.AddHours(2),    // Закінчиться через 2 години
-                    TotalCost = 135
-                }, // Це буде "Active"
-                
-                new BookingItem
-                {
-                    Id = 2,
-                    CarName = "BMW X5",
-                    StartTime = DateTime.Now.AddDays(-5),
-                    EndTime = DateTime.Now.AddDays(-4),
-                    TotalCost = 1200
-                }, // Це буде "Completed"
+                    // Should not happen if logic flows correctly, but safety first
+                    return; 
+                }
 
-                new BookingItem
-                {
-                    Id = 3,
-                    CarName = "Toyota Camry",
-                    StartTime = DateTime.Now.AddDays(1),
-                    EndTime = DateTime.Now.AddDays(2),
-                    TotalCost = 600
-                } // Це буде "Upcoming"
-            };
+                var bookingDtos = await _bookingService.GetBookingsByUserIdAsync(currentUser.Id);
 
-            IsBusy = false;
+                Bookings.Clear();
+
+                foreach (var dto in bookingDtos)
+                {
+                    Bookings.Add(new BookingItem
+                    {
+                        Id = dto.Id,
+                        CarName = $"{dto.CarMake} {dto.CarModel}", // Combine Make + Model
+                        StartTime = dto.StartTime,
+                        EndTime = dto.EndTime,
+                        TotalCost = dto.TotalCost
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading bookings: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         [RelayCommand]
