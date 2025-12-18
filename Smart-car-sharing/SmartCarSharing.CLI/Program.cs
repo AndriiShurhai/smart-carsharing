@@ -28,10 +28,15 @@ class Program
         // Add basic navigation commands
         mainMenu.Add(new ExitCommand());
 
-        // Add Admin Commands (SC-41)
+        // Add Admin Commands
         mainMenu.Add(new ListUsersCommand(context, output));
         mainMenu.Add(new ListCarsCommand(context, output));
         mainMenu.Add(new StatsCommand(context, output));
+
+        // Add Vehicle Management Commands
+        mainMenu.Add(new AddVehicleCommand(context, input, output));
+        mainMenu.Add(new RemoveVehicleCommand(context, input, output));
+        mainMenu.Add(new UpdateVehicleStatusCommand(context, input, output));
 
 
         // 4. Run the Shell
