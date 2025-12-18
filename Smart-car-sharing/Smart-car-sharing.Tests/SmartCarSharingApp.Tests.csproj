@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Smart-car-sharing\SmartCarSharingApp.UI.csproj" />
+    <ProjectReference Include="..\SmartCarSharing.CLI\SmartCarSharing.CLI.csproj" />
     <ProjectReference Include="..\SmartCarSharing.Core\SmartCarSharing.Core.csproj" />
     <ProjectReference Include="..\SmartCarSharing.Data\SmartCarSharing.Data.csproj" />
   </ItemGroup>

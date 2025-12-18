@@ -78,8 +78,8 @@ namespace SmartCarSharing.CLI.Commands
             _writer.Write("Enter Car ID to remove: ");
             if (int.TryParse(_reader.ReadLine(), out int id))
             {
-                var car = _context.Cars.Find(id);
-                if (car != null)
+                var car = _context.Cars.Find(id); 
+                if (car != null) // null check
                 {
                     _context.Cars.Remove(car);
                     _context.SaveChanges();
@@ -120,7 +120,7 @@ namespace SmartCarSharing.CLI.Commands
             if (int.TryParse(_reader.ReadLine(), out int id))
             {
                 var car = _context.Cars.Find(id);
-                if (car != null)
+                if (car != null) // null check
                 {
                     _writer.WriteLine($"Current Status: {car.Status}");
                     _writer.Write("Enter New Status (Available/Maintenance/Booked): ");
