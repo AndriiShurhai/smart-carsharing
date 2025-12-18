@@ -118,6 +118,11 @@ namespace SmartCarSharing.Data.Services
             var car = await _context.Cars.FindAsync(carId);
             if (car == null) return BookingResult.Failure("Автомобіль не знайдено.");
 
+            if (car.Status != "Available")
+            {
+                return BookingResult.Failure($"This car is currently unavailable (Status: {car.Status}).");
+            }
+
             // Перевірка на перетин дат (Overlapping)
             bool isOccupied = await _context.Bookings
                 .AnyAsync(b => b.CarId == carId &&

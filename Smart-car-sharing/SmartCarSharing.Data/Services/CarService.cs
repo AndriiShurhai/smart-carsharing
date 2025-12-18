@@ -25,6 +25,7 @@ namespace SmartCarSharing.Data.Services
             _logger.LogInformation("Fetching all cars...");
 
             var cars = await _context.Cars
+                .Where(c => c.Status == "Available")
                 .OrderBy(c => c.Make)
                 .ThenBy(c => c.Model)
                 .ToListAsync();
@@ -47,6 +48,7 @@ namespace SmartCarSharing.Data.Services
             search = search.ToLower();
 
             var cars = await _context.Cars
+                .Where(c => c.Status == "Available")
                 .Where(c =>
                     c.Make.ToLower().Contains(search) ||
                     c.Model.ToLower().Contains(search) ||

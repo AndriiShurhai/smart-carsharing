@@ -41,7 +41,7 @@ namespace SmartCarSharingApp.UI.ViewModels
             _loginViewModel = new LoginViewModel(_authService);
             _registerViewModel = new RegisterViewModel(_authService);
             _dashboardViewModel = new DashboardViewModel(_carService);
-            _myBookingsViewModel = new MyBookingsViewModel();
+            _myBookingsViewModel = new MyBookingsViewModel(_bookingService);
 
             // --- Налаштування навігації ---
 
@@ -57,10 +57,11 @@ namespace SmartCarSharingApp.UI.ViewModels
             _dashboardViewModel.RequestNavigateToDetails += NavigateToCarDetails;
 
             // 4. Dashboard -> Мої бронювання
-            _dashboardViewModel.RequestNavigateToMyBookings += () =>
+            _dashboardViewModel.RequestNavigateToMyBookings += async () =>
             {
-                // Тут можна було б оновити дані в _myBookingsViewModel перед показом
                 CurrentViewModel = _myBookingsViewModel;
+                // Refresh the list from DB every time we navigate here
+                await _myBookingsViewModel.LoadDataAsync();
             };
 
             // 5. Мої бронювання -> Назад (на Dashboard)
