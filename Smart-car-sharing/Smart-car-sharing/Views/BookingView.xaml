@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="SmartCarSharingApp.UI.Views.BookingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewmodels="clr-namespace:SmartCarSharingApp.UI.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="800">
+
+    <Grid Background="#F0F2F5">
+        <Border Background="White" 
+                CornerRadius="15" 
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Center"
+                Width="450"
+                Padding="30">
+
+            <Border.Effect>
+                <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="20" ShadowDepth="5" Direction="270"/>
+            </Border.Effect>
+
+            <StackPanel>
+                <TextBlock Text="Бронювання авто" 
+                           FontSize="24" 
+                           FontWeight="Bold" 
+                           Foreground="#333" 
+                           HorizontalAlignment="Center" 
+                           Margin="0,0,0,5"/>
+
+                <TextBlock Text="{Binding CarName}" 
+                           FontSize="16" 
+                           Foreground="Gray" 
+                           HorizontalAlignment="Center" 
+                           Margin="0,0,0,25"/>
+
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="15"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Початок" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <DatePicker SelectedDate="{Binding StartDate}" Height="35"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Кінець" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <DatePicker SelectedDate="{Binding EndDate}" Height="35"/>
+                    </StackPanel>
+                </Grid>
+
+                <Separator Background="#EEE" Margin="0,10"/>
+
+                <Grid Margin="0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Загальна вартість:" 
+                               FontSize="18" 
+                               VerticalAlignment="Center" 
+                               Foreground="#555"/>
+
+                    <TextBlock Grid.Column="1" 
+                               Text="{Binding TotalPriceString}" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="#007ACC"/>
+                </Grid>
+
+                <Separator Background="#EEE" Margin="0,10,0,25"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="15"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                            Command="{Binding CancelCommand}"
+                            Content="Скасувати"
+                            Height="45"
+                            Background="White"
+                            BorderBrush="#DDD"
+                            BorderThickness="1"
+                            Foreground="#555"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" 
+                                        BorderBrush="{TemplateBinding BorderBrush}" 
+                                        BorderThickness="{TemplateBinding BorderThickness}" 
+                                        CornerRadius="8">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <Button Grid.Column="2"
+                            Command="{Binding ConfirmCommand}"
+                            Content="Підтвердити"
+                            Height="45"
+                            Background="#007ACC"
+                            Foreground="White"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

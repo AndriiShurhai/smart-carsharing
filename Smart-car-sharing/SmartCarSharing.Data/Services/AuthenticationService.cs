@@ -1,0 +1,59 @@
+﻿using Microsoft.EntityFrameworkCore;
+using SmartCarSharing.Core;
+using SmartCarSharing.Core.Services;
+
+using SmartCarSharing.Data;
+using System;
+using System.Threading.Tasks;
+// using BCrypt.Net; // Переконайтеся, що це підключено
+
+namespace SmartCarSharing.Data.Services
+{
+    public class AuthenticationService : IAuthenticationService
+    {
+        private readonly AppDbContext _context;
+
+        public AuthenticationService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task RegisterUserAsync(string name, string email, string password, string driverLicense)
+        {
+            var emailExists = await _context.Users
+                .AnyAsync(u => u.Email.ToLower() == email.ToLower());
+
+            if (emailExists)
+            {
+                throw new InvalidOperationException("Користувач з такою електронною поштою вже існує.");
+            }
+
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+
+            var newUser = new User
+            {
+                Name = name,
+                Email = email,
+                HashedPassword = hashedPassword,
+                DriverLicenseNumber = driverLicense // Зберігаємо права
+            };
+
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<User?> LoginUserAsync(string email, string password)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+            if (user == null) return null;
+
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.HashedPassword);
+
+            if (!isPasswordValid) return null;
+
+            return user;
+        }
+    }
+}

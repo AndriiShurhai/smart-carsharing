@@ -1,9 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36202.13 d17.14
+VisualStudioVersion = 17.14.36202.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smart-car-sharing", "Smart-car-sharing\Smart-car-sharing.csproj", "{305A7902-A1DD-4178-AA67-BC6C8CBA5ABD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCarSharingApp.UI", "Smart-car-sharing\SmartCarSharingApp.UI.csproj", "{305A7902-A1DD-4178-AA67-BC6C8CBA5ABD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCarSharingApp.Tests", "Smart-car-sharing.Tests\SmartCarSharingApp.Tests.csproj", "{884F005B-376B-4F17-9890-4160DBA62783}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCarSharing.Data", "SmartCarSharing.Data\SmartCarSharing.Data.csproj", "{93A85EA2-8A15-4F23-AD5D-6B05418EA576}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCarSharing.Core", "SmartCarSharing.Core\SmartCarSharing.Core.csproj", "{048F4EF4-83E6-4467-BD0E-51456BA0A8F0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		smartcarsharing.db = smartcarsharing.db
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartCarSharing.CLI", "SmartCarSharing.CLI\SmartCarSharing.CLI.csproj", "{ADC95E1B-9DAC-4EFE-A577-4C21A232D98D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +28,22 @@ Global
 		{305A7902-A1DD-4178-AA67-BC6C8CBA5ABD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{305A7902-A1DD-4178-AA67-BC6C8CBA5ABD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{305A7902-A1DD-4178-AA67-BC6C8CBA5ABD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{884F005B-376B-4F17-9890-4160DBA62783}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{884F005B-376B-4F17-9890-4160DBA62783}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{884F005B-376B-4F17-9890-4160DBA62783}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{884F005B-376B-4F17-9890-4160DBA62783}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93A85EA2-8A15-4F23-AD5D-6B05418EA576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93A85EA2-8A15-4F23-AD5D-6B05418EA576}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93A85EA2-8A15-4F23-AD5D-6B05418EA576}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93A85EA2-8A15-4F23-AD5D-6B05418EA576}.Release|Any CPU.Build.0 = Release|Any CPU
+		{048F4EF4-83E6-4467-BD0E-51456BA0A8F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{048F4EF4-83E6-4467-BD0E-51456BA0A8F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{048F4EF4-83E6-4467-BD0E-51456BA0A8F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{048F4EF4-83E6-4467-BD0E-51456BA0A8F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADC95E1B-9DAC-4EFE-A577-4C21A232D98D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADC95E1B-9DAC-4EFE-A577-4C21A232D98D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADC95E1B-9DAC-4EFE-A577-4C21A232D98D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADC95E1B-9DAC-4EFE-A577-4C21A232D98D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
